@@ -4,6 +4,7 @@ import { Server as SocketIOServer } from "socket.io";
 import chatRoutes from "./routes/chatRoutes";
 import chatController from "./controllers/chatController";
 import cors from "cors";
+import "dotenv/config";
 const app: Application = express();
 const server = http.createServer(app);
 const io = new SocketIOServer(server, {
@@ -17,7 +18,7 @@ const io = new SocketIOServer(server, {
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_URL || "http://localhost:3000",
   })
 );
 app.use("/api", chatRoutes);

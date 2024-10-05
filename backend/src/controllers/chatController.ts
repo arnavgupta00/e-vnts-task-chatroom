@@ -1,7 +1,6 @@
 import { Socket } from "socket.io";
 import redis from "../config/redisConfig";
 
-// Define the Message type
 interface Message {
   username: any;
   message: any;
@@ -15,12 +14,10 @@ class ChatController {
     this.loadRoomsFromRedis();
   }
 
-  // Save message to Redis
   public async saveMessage(room: string, message: Message): Promise<void> {
     await redis.rpush(room, JSON.stringify(message));
   }
 
-  // Get chat history from Redis
   public async getChatHistory(room: string): Promise<Message[]> {
     const messages = await redis.lrange(room, 0, -1);
     return messages.map((msg) => JSON.parse(msg));
@@ -39,7 +36,6 @@ class ChatController {
     }
   }
 
-  // Join or create a new room
   public async joinRoom(
     socket: Socket,
     room: string,
@@ -47,7 +43,6 @@ class ChatController {
   ): Promise<void> {
     socket.join(room);
 
-    // Create room if it doesn't exist
     if (!this.rooms[room]) {
       this.rooms[room] = [];
     }
@@ -65,7 +60,6 @@ class ChatController {
     socket.leave(room);
     this.rooms[room] = this.rooms[room].filter((user) => user !== username);
 
-    // If room is empty, delete the room
     if (this.rooms[room].length === 0) {
       delete this.rooms[room];
     }
@@ -78,7 +72,6 @@ class ChatController {
     io.to(room).emit("message", message);
   }
 
-  // Get list of available rooms
   public getAvailableRooms(): string[] {
     return Object.keys(this.rooms);
   }
