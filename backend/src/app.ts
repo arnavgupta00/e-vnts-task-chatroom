@@ -3,7 +3,7 @@ import http from "http";
 import { Server as SocketIOServer } from "socket.io";
 import chatRoutes from "./routes/chatRoutes";
 import chatController from "./controllers/chatController";
-
+import cors from "cors";
 const app: Application = express();
 const server = http.createServer(app);
 const io = new SocketIOServer(server, {
@@ -15,6 +15,11 @@ const io = new SocketIOServer(server, {
 
 // Middleware
 app.use(express.json());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+  })
+);
 app.use("/api", chatRoutes);
 
 // Handle socket connections
@@ -28,13 +33,11 @@ io.on("connection", (socket) => {
     const history = await chatController.getChatHistory(room);
     socket.emit("chatHistory", history);
 
-    socket
-      .to(room)
-      .emit("message", {
-        username: "Admin",
-        message: `${username} has joined the chat`,
-        timestamp: new Date().toISOString(),
-      });
+    socket.to(room).emit("message", {
+      username: "Admin",
+      message: `${username} has joined the chat`,
+      timestamp: new Date().toISOString(),
+    });
   });
 
   // Handle message sending
@@ -47,13 +50,11 @@ io.on("connection", (socket) => {
   // Handle user leaving
   socket.on("leaveRoom", ({ username, room }) => {
     chatController.leaveRoom(socket, room, username);
-    socket
-      .to(room)
-      .emit("message", {
-        username: "Admin",
-        message: `${username} has left the chat`,
-        timestamp: new Date().toISOString(),
-      });
+    socket.to(room).emit("message", {
+      username: "Admin",
+      message: `${username} has left the chat`,
+      timestamp: new Date().toISOString(),
+    });
   });
 
   socket.on("disconnect", () => {

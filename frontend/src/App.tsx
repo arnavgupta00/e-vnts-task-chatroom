@@ -9,7 +9,7 @@ function App() {
 
   if (userNameBool === false) {
     return (
-      <div className="flex items-center justify-center w-screen min-h-screen bg-black">
+      <div className="flex items-center justify-center w-screen min-h-screen bg-black ">
         <div className="bg-[#1C1C1E] p-6 rounded-2xl shadow-lg w-full max-w-md">
           <h1 className="text-2xl font-semibold mb-4 text-center text-zinc">
             Enter your username
@@ -32,13 +32,20 @@ function App() {
     );
   } else {
     return (
-      <div className="flex items-center justify-center w-screen min-h-screen bg-black">
-        <div className="h-full w-2/3 flex flex-col items-center justify-center">
-          <h1 className="text-2xl font-semibold mb-4 text-center text-zinc">
-            Greetings!! {userName}
-          </h1>
+      <div className="flex items-center justify-center w-screen min-h-screen bg-black gap-4 ">
+        <div className="h-full w-1/2 flex flex-col items-center justify-center ">
+          <div className="flex flex-col items-start justify-center">
+            <h1 className="text-6xl font-semibold mb-4 text-center text-zinc poppins-semibold">
+              Greetings!
+            </h1>
+            <p className="text-6xl font-semibold mb-4 text-center text-zinc poppins-light">
+              {userName}
+            </p>
+          </div>
         </div>
-        <div></div>
+        <div className="h-full w-1/2 flex flex-col items-start justify-center ">
+          <RoomSelector setRoom={setRoom} />
+        </div>
       </div>
     );
   }
