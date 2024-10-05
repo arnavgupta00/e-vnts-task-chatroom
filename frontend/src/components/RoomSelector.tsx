@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { SERVER_URL } from "./constant";
+import { ArrowBigLeft, ArrowLeft, Plus } from "lucide-react";
 
 interface RoomSelectorProps {
   setRoom: (room: string) => void;
@@ -8,13 +10,12 @@ interface RoomSelectorProps {
 const RoomSelector: React.FC<RoomSelectorProps> = ({ setRoom }) => {
   const [rooms, setRooms] = useState<string[]>([]);
   const [newRoomName, setNewRoomName] = useState<string>("");
-
+  const [newRoomBool, setNewRoomBool] = useState<boolean>(false);
   // Fetch available rooms from the backend
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/rooms");
-        console.log("res.data.rooms", res.data);
+        const res = await axios.get(SERVER_URL + "/api/rooms");
         setRooms(res.data.rooms);
       } catch (err) {
         console.error(err);
@@ -26,20 +27,54 @@ const RoomSelector: React.FC<RoomSelectorProps> = ({ setRoom }) => {
 
   // Create a new room
   const createRoom = async () => {
-    const roomName = prompt("Enter new room name");
+    const roomName = newRoomName.trim();
 
     if (roomName) {
       await axios
-        .post("http://localhost:5000/api/rooms", { roomName })
+        .post(SERVER_URL + "/api/rooms", { roomName })
         .then((res) => {
-          setRooms([...rooms, roomName]); // Add the new room to the list
-          setRoom(roomName); // Automatically join the newly created room
+          setRooms([...rooms, roomName]);
+          setRoom(roomName);
         })
         .catch((err) => {
-          alert(err.response.data.message); // Handle room creation failure
+          alert(err.response.data.message);
         });
     }
+    setNewRoomBool(false);
   };
+
+  if (newRoomBool) {
+    return (
+      <div className="bg-[#1C1C1E] p-6 rounded-2xl shadow-lg w-full max-w-md">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-semibold mb-4 text-center text-zinc">
+            Enter the room name
+          </h1>
+          <ArrowLeft
+            size={24}
+            className=""
+            onClick={() => {
+              setNewRoomBool(false);
+              setNewRoomName("");
+            }}
+          />
+        </div>
+        <input
+          type="text"
+          value={newRoomName}
+          placeholder="Type the room name..."
+          onChange={(e) => setNewRoomName(e.target.value)}
+          className="w-full p-2 border mb-4 bg-gray-200 text-[#1C1C1E] rounded-xl"
+        />
+        <button
+          onClick={createRoom}
+          className="w-full bg-[#007AFF] text-white p-2 rounded-xl hover:bg-blue-600 transition duration-200"
+        >
+          Create
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#1C1C1E] p-6 rounded-2xl shadow-lg w-full max-w-md">
@@ -57,13 +92,12 @@ const RoomSelector: React.FC<RoomSelectorProps> = ({ setRoom }) => {
             >
               {room}
               {/* Extend the borders vertically */}
-            
             </button>
           ))}
       </div>
 
       <button
-        onClick={createRoom}
+        onClick={() => setNewRoomBool(true)}
         className="w-full bg-[#007AFF] text-white p-2 rounded-xl hover:bg-blue-600 transition duration-200"
       >
         Create new room

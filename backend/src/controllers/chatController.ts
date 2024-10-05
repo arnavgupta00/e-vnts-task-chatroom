@@ -9,19 +9,11 @@ interface Message {
 }
 
 class ChatController {
-  private rooms: { [roomName: string]: string[] } = {
-    General: [],
-    Random: [],
-    News: [],
-    Tech: [],
-    Games: [],
-    Movies: [],
-    Music: [],
-    Sports: [],
-    Books: [],
-    Science: [],
+  private rooms: { [roomName: string]: string[] } = {};
 
-  };
+  constructor() {
+    this.loadRoomsFromRedis();
+  }
 
   // Save message to Redis
   public async saveMessage(room: string, message: Message): Promise<void> {
@@ -34,8 +26,25 @@ class ChatController {
     return messages.map((msg) => JSON.parse(msg));
   }
 
+  // Save rooms to Redis
+  private async saveRoomsToRedis(): Promise<void> {
+    await redis.set("rooms", JSON.stringify(this.rooms));
+  }
+
+  // Load rooms from Redis
+  private async loadRoomsFromRedis(): Promise<void> {
+    const rooms = await redis.get("rooms");
+    if (rooms) {
+      this.rooms = JSON.parse(rooms);
+    }
+  }
+
   // Join or create a new room
-  public joinRoom(socket: Socket, room: string, username: string): void {
+  public async joinRoom(
+    socket: Socket,
+    room: string,
+    username: string
+  ): Promise<void> {
     socket.join(room);
 
     // Create room if it doesn't exist
@@ -44,10 +53,15 @@ class ChatController {
     }
 
     this.rooms[room].push(username);
+    await this.saveRoomsToRedis();
   }
 
   // Leave room
-  public leaveRoom(socket: Socket, room: string, username: string): void {
+  public async leaveRoom(
+    socket: Socket,
+    room: string,
+    username: string
+  ): Promise<void> {
     socket.leave(room);
     this.rooms[room] = this.rooms[room].filter((user) => user !== username);
 
@@ -55,6 +69,8 @@ class ChatController {
     if (this.rooms[room].length === 0) {
       delete this.rooms[room];
     }
+
+    await this.saveRoomsToRedis();
   }
 
   // Broadcast message to room
@@ -68,9 +84,10 @@ class ChatController {
   }
 
   // Create a new room
-  public createRoom(room: string): boolean {
+  public async createRoom(room: string): Promise<boolean> {
     if (!this.rooms[room]) {
       this.rooms[room] = [];
+      await this.saveRoomsToRedis();
       return true;
     }
     return false;

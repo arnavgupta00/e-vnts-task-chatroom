@@ -45,6 +45,7 @@ io.on("connection", (socket) => {
     const msg = { username, message, timestamp: new Date().toISOString() };
     await chatController.saveMessage(room, msg);
     chatController.broadcastMessage(socket, room, msg);
+    socket.to(room).emit("message", msg);
   });
 
   // Handle user leaving
