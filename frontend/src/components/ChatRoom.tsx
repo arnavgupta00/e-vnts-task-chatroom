@@ -34,9 +34,7 @@ const ChatRoom: React.FC = () => {
       setMessages(history);
     });
 
-    return () => {
-      socket.emit("leaveRoom", { username, room });
-    };
+    
   }, [username, room]);
 
   const sendMessage = (e: FormEvent<HTMLFormElement>) => {
