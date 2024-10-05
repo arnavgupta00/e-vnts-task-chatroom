@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { SERVER_URL } from "./constant";
-import { ArrowBigLeft, ArrowLeft, Plus } from "lucide-react";
+import {  ArrowLeft } from "lucide-react";
 
 interface RoomSelectorProps {
   setRoom: (room: string) => void;
@@ -32,7 +32,7 @@ const RoomSelector: React.FC<RoomSelectorProps> = ({ setRoom }) => {
     if (roomName) {
       await axios
         .post(SERVER_URL + "/api/rooms", { roomName })
-        .then((res) => {
+        .then(() => {
           setRooms([...rooms, roomName]);
           setRoom(roomName);
         })
