@@ -1,35 +1,47 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from "react";
+import RoomSelector from "./components/RoomSelector";
+import ChatRoom from "./components/ChatRoom";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [userName, setUserName] = useState<string>("");
+  const [room, setRoom] = useState<string | null>(null);
+  const [userNameBool, setUserNameBool] = useState<boolean>(false);
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+  if (userNameBool === false) {
+    return (
+      <div className="flex items-center justify-center w-screen min-h-screen bg-black">
+        <div className="bg-[#1C1C1E] p-6 rounded-2xl shadow-lg w-full max-w-md">
+          <h1 className="text-2xl font-semibold mb-4 text-center text-zinc">
+            Enter your username
+          </h1>
+          <input
+            type="text"
+            value={userName}
+            placeholder="Type your name..."
+            onChange={(e) => setUserName(e.target.value)}
+            className="w-full p-2 border mb-4 bg-gray-200 text-[#1C1C1E] rounded-xl"
+          />
+          <button
+            onClick={() => setUserNameBool(true)}
+            className="w-full bg-[#007AFF] text-white p-2 rounded-xl hover:bg-blue-600 transition duration-200"
+          >
+            Submit
+          </button>
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+    );
+  } else {
+    return (
+      <div className="flex items-center justify-center w-screen min-h-screen bg-black">
+        <div className="h-full w-2/3 flex flex-col items-center justify-center">
+          <h1 className="text-2xl font-semibold mb-4 text-center text-zinc">
+            Greetings!! {userName}
+          </h1>
+        </div>
+        <div></div>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    );
+  }
 }
 
-export default App
+export default App;
